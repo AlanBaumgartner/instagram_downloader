@@ -4,7 +4,7 @@ This program downloads all photos and videos from a user without the official AP
 
 ## Usage
 ```
-instagram_downloader.py -u 'username'
+instagram_downloader.py -u 'username 1' 'username 2' 'username n'
 ```
 ## License
 
