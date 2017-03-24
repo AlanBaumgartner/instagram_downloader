@@ -7,8 +7,10 @@ async def download_file(username, url, session, sem, loop=None):
             out = await resp.read()
             filename = url.split('/')[-1]
             path = username + '/' + filename
+
             if not os.path.exists(username):
                 os.makedirs(username)
+
             with open(path, 'wb') as f:
                 f.write(out)
 
@@ -43,7 +45,7 @@ async def login(username, password, session):
             if 'authenticated' in text:
                 pass
             else:
-                sys.exit(text)
+                sys.exit('Login Failed')
 
 async def start(usernames, igname, igpass, conns=50, loop=None):
     #Puts each url in a list for each username
