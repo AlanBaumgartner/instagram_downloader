@@ -48,8 +48,10 @@ async def login(username, password, session):
 
 async def main(usernames, igname, igpass, conns=50, loop=None):
     async with aiohttp.ClientSession(loop=loop) as session:
-        if igname != None:
+        if igname != None and igpass != None:
             await login(igname, igpass, session)
+        else:
+            print('Username and/or password not entered, will not be able to access private profiles.')
         for username in usernames:
             sem = asyncio.BoundedSemaphore(conns)
             url = 'http://instagram.com/' + username + '/media/?max_id='
