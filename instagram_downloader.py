@@ -1,4 +1,4 @@
-import aiohttp, asyncio, argparse, os
+import aiohttp, asyncio, argparse, os, re
 
 async def download_file(username, url, session, sem, loop=None):
     async with sem:
@@ -46,7 +46,7 @@ async def login(username, password, session):
             else:
                 print(text)
 
-async def main(usernames, igname, igpass, conns=50, loop=None):
+async def start(usernames, igname, igpass, conns=50, loop=None):
     async with aiohttp.ClientSession(loop=loop) as session:
         if igname != None and igpass != None:
             await login(igname, igpass, session)
@@ -74,20 +74,24 @@ async def main(usernames, igname, igpass, conns=50, loop=None):
             tasks = [download_file(username, url, session, sem, loop=loop) for url in urls]
             await asyncio.gather(*tasks)
 
+def main(usernames, igname, igpass):
+    loop = asyncio.get_event_loop() 
+    try:
+        loop.run_until_complete(start(usernames, igname, igpass))
+    finally:
+        loop.close()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-u", dest='username', help="Instagram username",
-                        action="store")
-    parser.add_argument("-p", dest='password', help="Instagram password",
-                        action="store")
-    parser.add_argument("-d", dest='check', help="Instagram username to download photos from",
-                        action="store", nargs="+")
+
+    parser.add_argument("-u", dest='username', action="store")
+    parser.add_argument("-p", dest='password', action="store")
+    parser.add_argument("-d", dest='check', action="store", nargs="+")
+    
     args = parser.parse_args()
 
     igname = args.username
     igpass = args.password
     usernames = args.check
 
-    loop = asyncio.get_event_loop() 
-    loop.run_until_complete(main(usernames, igname, igpass))
+    main(usernames, igname, igpass)
