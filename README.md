@@ -6,7 +6,7 @@ Your username and password are optional, but they allow you to download private 
 
 ## Usage
 ```
-instagram_downloader.py -u 'your username -p 'your password' -d 'username 1' 'username 2' 'username n'
+instagram_downloader.py -u 'your username' -p 'your password' -d 'username 1' 'username 2' 'username n'
 ```
 ## License
 
