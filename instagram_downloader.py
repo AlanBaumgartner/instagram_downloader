@@ -1,6 +1,7 @@
-import aiohttp, asyncio, argparse, os, re
+import aiohttp, asyncio, argparse, os
 
 async def download_file(username, url, session, sem, loop=None):
+    #Downloads and saves photos/videos
     async with sem:
         async with session.get(url) as resp:
             out = await resp.read()
@@ -12,13 +13,14 @@ async def download_file(username, url, session, sem, loop=None):
                 f.write(out)
 
 async def getJSON(url, session):
+    #Gets json response which contains photo/video urls
     async with session.get(url) as resp:
         data = await resp.json()
         return data
 
 async def login(username, password, session):
-    loginurl = 'https://www.instagram.com/accounts/login/ajax/'
-    url = 'https://www.instagram.com/'
+    #Logs into Instagram
+    loginurl = 'https://www.instagram.com/accounts/login/ajax/'; url = 'https://www.instagram.com/'
 
     async with session.get(url) as response:
         csrftoken = await response.text()
@@ -28,15 +30,12 @@ async def login(username, password, session):
     async with session.post(
             loginurl,
                 headers={
-                    'x-csrftoken': csrftoken,
-                    'x-instagram-ajax':'1',
+                    'x-csrftoken': csrftoken, 'x-instagram-ajax':'1',
                     'x-requested-with': 'XMLHttpRequest',
-                    'Origin': url,
-                    'Referer': url,
-                },
+                    'Origin': url, 'Referer': url
+                    },
                 data={
-                    'username':username,
-                    'password':password,
+                    'username':username, 'password':password
                 }
             ) as response:
 
@@ -44,9 +43,10 @@ async def login(username, password, session):
             if 'authenticated' in text:
                 pass
             else:
-                print(text)
+                sys.exit(text)
 
 async def start(usernames, igname, igpass, conns=50, loop=None):
+    #Puts each url in a list for each username
     async with aiohttp.ClientSession(loop=loop) as session:
         if igname != None and igpass != None:
             await login(igname, igpass, session)
@@ -55,9 +55,7 @@ async def start(usernames, igname, igpass, conns=50, loop=None):
         for username in usernames:
             sem = asyncio.BoundedSemaphore(conns)
             url = 'http://instagram.com/' + username + '/media/?max_id='
-            urls = []
-            max_id = ''
-            moreDataToFetch = True
+            urls = []; max_id = ''; moreDataToFetch = True
             while(moreDataToFetch):
                 nextUrl = url + max_id
                 jsonData = await getJSON(nextUrl, session)
@@ -75,23 +73,22 @@ async def start(usernames, igname, igpass, conns=50, loop=None):
             await asyncio.gather(*tasks)
 
 def main(usernames, igname, igpass):
-    loop = asyncio.get_event_loop() 
+    #Starts the loop
+    loop = asyncio.get_event_loop()
     try:
         loop.run_until_complete(start(usernames, igname, igpass))
     finally:
         loop.close()
 
 if __name__ == "__main__":
+    #Command line parser
     parser = argparse.ArgumentParser()
-
-    parser.add_argument("-u", dest='username', action="store")
-    parser.add_argument("-p", dest='password', action="store")
+    parser.add_argument("-u", dest='username', action="store"); parser.add_argument("-p", dest='password', action="store")
     parser.add_argument("-d", dest='check', action="store", nargs="+")
-    
     args = parser.parse_args()
 
-    igname = args.username
-    igpass = args.password
-    usernames = args.check
+    #Assign command line values to variables
+    igname = args.username; igpass = args.password; usernames = args.check
 
+    #Starts downloading
     main(usernames, igname, igpass)
