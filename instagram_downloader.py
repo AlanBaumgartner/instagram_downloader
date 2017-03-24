@@ -16,8 +16,40 @@ async def getJSON(url, session):
         data = await resp.json()
         return data
 
-async def main(usernames, conns=50, loop=None):
+async def login(username, password, session):
+    loginurl = 'https://www.instagram.com/accounts/login/ajax/'
+    url = 'https://www.instagram.com/'
+
+    async with session.get(url) as response:
+        csrftoken = await response.text()
+
+    csrftoken = csrftoken.split('csrf_token": "')[1].split('"')[0]
+
+    async with session.post(
+            loginurl,
+                headers={
+                    'x-csrftoken': csrftoken,
+                    'x-instagram-ajax':'1',
+                    'x-requested-with': 'XMLHttpRequest',
+                    'Origin': url,
+                    'Referer': url,
+                },
+                data={
+                    'username':username,
+                    'password':password,
+                }
+            ) as response:
+
+            text = await response.json()
+            if 'authenticated' in text:
+                pass
+            else:
+                print(text)
+
+async def main(usernames, igname, igpass, conns=50, loop=None):
     async with aiohttp.ClientSession(loop=loop) as session:
+        if igname != None:
+            await login(igname, igpass, session)
         for username in usernames:
             sem = asyncio.BoundedSemaphore(conns)
             url = 'http://instagram.com/' + username + '/media/?max_id='
@@ -43,10 +75,17 @@ async def main(usernames, conns=50, loop=None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-u", dest='username', help="Instagram username to download photos from",
+    parser.add_argument("-u", dest='username', help="Instagram username",
+                        action="store")
+    parser.add_argument("-p", dest='password', help="Instagram password",
+                        action="store")
+    parser.add_argument("-d", dest='check', help="Instagram username to download photos from",
                         action="store", nargs="+")
     args = parser.parse_args()
-    usernames = args.username
+
+    igname = args.username
+    igpass = args.password
+    usernames = args.check
 
     loop = asyncio.get_event_loop() 
-    loop.run_until_complete(main(usernames))
+    loop.run_until_complete(main(usernames, igname, igpass))
