@@ -22,7 +22,8 @@ async def getJSON(url, session):
 
 async def login(username, password, session):
     #Logs into Instagram
-    loginurl = 'https://www.instagram.com/accounts/login/ajax/'; url = 'https://www.instagram.com/'
+    loginurl = 'https://www.instagram.com/accounts/login/ajax/'
+    url = 'https://www.instagram.com/'
 
     async with session.get(url) as response:
         csrftoken = await response.text()
@@ -57,7 +58,9 @@ async def start(usernames, igname, igpass, conns=50, loop=None):
         for username in usernames:
             sem = asyncio.BoundedSemaphore(conns)
             url = 'http://instagram.com/' + username + '/media/?max_id='
-            urls = []; max_id = ''; moreDataToFetch = True
+            urls = []
+            max_id = ''
+            moreDataToFetch = True
             while(moreDataToFetch):
                 nextUrl = url + max_id
                 jsonData = await getJSON(nextUrl, session)
@@ -85,12 +88,15 @@ def main(usernames, igname, igpass):
 if __name__ == "__main__":
     #Command line parser
     parser = argparse.ArgumentParser()
-    parser.add_argument("-u", dest='username', action="store"); parser.add_argument("-p", dest='password', action="store")
+    parser.add_argument("-u", dest='username', action="store")
+    parser.add_argument("-p", dest='password', action="store")
     parser.add_argument("-d", dest='check', action="store", nargs="+")
     args = parser.parse_args()
 
     #Assign command line values to variables
-    igname = args.username; igpass = args.password; usernames = args.check
+    igname = args.username
+    igpass = args.password
+    usernames = args.check
 
     #Starts downloading
     main(usernames, igname, igpass)
