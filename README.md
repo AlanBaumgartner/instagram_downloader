@@ -4,6 +4,8 @@ This program downloads all photos and videos from a user without the official AP
 
 Your username and password are optional, but they allow you to download private profiles that you follow photos and videos also.
 
+NEW: GUI support in the 'GUI' Branch. Just run it, type in instagram username, password, and textfile with all the usernames to check.
+
 ## Usage
 ```
 instagram_downloader.py -u 'your username' -p 'your password' -d 'username 1' 'username 2' 'username n'
