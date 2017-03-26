@@ -1,4 +1,14 @@
 import aiohttp, asyncio, argparse, os
+from tkinter import *
+
+def get_usernames(inputfile):
+    #Gets usernames to check from a file
+    try:
+        with open(inputfile, "r") as f:
+            usernames = f.read().split("\n")
+            return usernames
+    except:
+        sys.exit(str(inputfile) + ' does not exists')
 
 async def download_file(username, url, session, sem, loop=None):
     #Downloads and saves photos/videos
@@ -77,8 +87,12 @@ async def start(usernames, igname, igpass, conns=50, loop=None):
             tasks = [download_file(username, url, session, sem, loop=loop) for url in urls]
             await asyncio.gather(*tasks)
 
-def main(usernames, igname, igpass):
+def main():
     #Starts the loop
+    usernames = get_usernames(file_entry.get())
+    igname = username_entry.get()
+    igpass = password_entry.get()
+
     loop = asyncio.get_event_loop()
     try:
         loop.run_until_complete(start(usernames, igname, igpass))
@@ -86,17 +100,26 @@ def main(usernames, igname, igpass):
         loop.close()
 
 if __name__ == "__main__":
-    #Command line parser
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-u", dest='username', action="store")
-    parser.add_argument("-p", dest='password', action="store")
-    parser.add_argument("-d", dest='check', action="store", nargs="+")
-    args = parser.parse_args()
+    master = Tk()
 
-    #Assign command line values to variables
-    igname = args.username
-    igpass = args.password
-    usernames = args.check
+    username_label = Label(master, text='Username', relief='sunken', width=15)
+    password_label = Label(master, text='Password', relief='sunken', width=15)
+    file_label = Label(master, text='File to check', relief='sunken', width=15)
 
-    #Starts downloading
-    main(usernames, igname, igpass)
+    username_entry = Entry(master)
+    password_entry = Entry(master)
+    file_entry = Entry(master)
+
+    start_button = Button(master, text="Start", command=lambda: main(), width=15)
+
+    username_label.grid(row=0,column=0)
+    password_label.grid(row=1,column=0)
+    file_label.grid(row=2,column=0)
+
+    username_entry.grid(row=0,column=1)
+    password_entry.grid(row=1,column=1)
+    file_entry.grid(row=2,column=1)
+
+    start_button.grid(row=3, column=0)
+
+    mainloop()
