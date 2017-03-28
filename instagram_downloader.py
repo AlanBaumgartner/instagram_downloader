@@ -1,5 +1,7 @@
 import aiohttp, asyncio, argparse, os
 
+__author__ = "Alan Baumgartner"
+
 async def download_file(username, url, session, sem, loop=None):
     #Downloads and saves photos/videos
     async with sem:
