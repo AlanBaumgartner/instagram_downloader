@@ -67,7 +67,7 @@ class ImportDialog(QDialog):
         layout.addWidget(buttons, 1, 0, 2, 0)
 
         self.setLayout(layout)
-        self.setGeometry(400, 400, 200, 60)
+        self.setGeometry(400, 400, 300, 60)
 
     @staticmethod
     def getFileInfo():
