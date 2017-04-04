@@ -48,7 +48,7 @@ class ImportDialog(QDialog):
         super().__init__()
         self.setWindowFlags(self.windowFlags() ^ Qt.WindowContextHelpButtonHint)
         self.setWindowModality(Qt.ApplicationModal)
-        self.setWindowTitle('Import usernames')
+        self.setWindowTitle('Import Usernames')
         layout = QGridLayout()
 
         self.file_label = QLabel('Filename')
@@ -193,7 +193,7 @@ class App(QMainWindow):
 
         #Declares some constructor variables.
         super().__init__()
-        self.title = 'Instagram Username Checker'
+        self.title = 'Instagram Downloader'
         self.left = 300
         self.top = 300
         self.width = 300
