@@ -182,10 +182,12 @@ class Checker(QThread):
                 ) as response:
 
                 text = await response.json()
-                if 'authenticated' in text:
-                    pass
+                
+                if text['authenticated']:
+                    return True
                 else:
-                    sys.exit(text)
+                    self.update.emit('Login Failed')
+                    return False
 
 class App(QMainWindow):
  
